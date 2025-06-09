@@ -1,3 +1,5 @@
+package GUIOODESIGN;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -36,7 +38,7 @@ public class TTTGraphics extends JFrame {
 
     // This enum (inner class) is used for:
     // 1. Player: CROSS, NOUGHT
-    // 2. Cell's content: CROSS, NOUGHT and NO_SEED
+    // 2. GUIOODESIGN.Cell's content: CROSS, NOUGHT and NO_SEED
     public enum Seed {
         CROSS, NOUGHT, NO_SEED
     }
