@@ -91,6 +91,8 @@ public class GameMain extends JPanel {
                 board.cells[row][col].content = Seed.NO_SEED; // all cells empty
             }
         }
+        // Panggil newGame() milik Board untuk mereset semua sel dan winningLineInfo
+        board.newGame();
         currentPlayer = Seed.CROSS;    // cross plays first
         currentState = State.PLAYING;  // ready to play
     }
