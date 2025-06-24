@@ -3,13 +3,23 @@ import java.awt.*;
 
 public class MainMenuPanel extends JPanel {
     private Image backgroundImage;
+    private JFrame frame; // Menambahkan referensi ke JFrame
 
     public MainMenuPanel(JFrame frame) {
+        this.frame = frame; // Simpan referensi frame
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
 
+        // --- TAMBAHKAN BARIS INI ---
+        // Atur ukuran preferred untuk MainMenuPanel agar tidak terlalu kecil
+        // Ukuran ini harus setidaknya sama atau lebih besar dari gambar latar belakang
+        // atau cukup besar untuk menampung semua komponen.
+        setPreferredSize(new Dimension(400, 450)); // Contoh ukuran, sesuaikan jika perlu
+        // --- AKHIR TAMBAH ---
+
         // Load background image from resource folder
         backgroundImage = new ImageIcon(getClass().getClassLoader().getResource("images/background ttc.jpg")).getImage();
+
 
         JLabel title = new JLabel("Tic Tac Toe");
         title.setFont(new Font("Arial", Font.BOLD, 36));
@@ -30,7 +40,10 @@ public class MainMenuPanel extends JPanel {
 
             frame.setContentPane(gamePanel);
             frame.revalidate();
+            // frame.repaint(); // repaint tidak selalu diperlukan setelah setContentPane dan revalidate
+            frame.pack(); // Panggil pack() di sini agar frame menyesuaikan ukuran panel game
         });
+
         JButton exitButton = new JButton("Keluar");
 
         // Styling buttons transparan
@@ -43,17 +56,10 @@ public class MainMenuPanel extends JPanel {
             btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
         }
 
-        startButton.addActionListener(e -> {
-            GameMain gamePanel = new GameMain();
-            frame.setContentPane(gamePanel);
-            frame.revalidate();
-            frame.repaint();
-        });
-
         exitButton.addActionListener(e -> System.exit(0));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 0, 15, 0);
+        gbc.insets = new Insets(15, 0, 15, 0); // Spasi antara komponen
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -69,6 +75,7 @@ public class MainMenuPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (backgroundImage != null) {
+            // Gambar latar belakang mengisi seluruh area panel
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
     }
