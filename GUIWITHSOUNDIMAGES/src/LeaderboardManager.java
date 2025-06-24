@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LeaderboardManager {
-    private static final String DB_URL = "jdbc:mysql://mysql-tictactoed05-pf25d05.f.aivencloud.com:PORT/DATABASE_NAME";
+    private static final String DB_URL = "jdbc:mysql://mysql-tictactoed05-pf25d05.f.aivencloud.com:19289/tictactoe";
     private static final String DB_USER = "avnadmin";
     private static final String DB_PASSWORD = "AVNS_Tv_cBPeS9me6-ToZ53E";
 
