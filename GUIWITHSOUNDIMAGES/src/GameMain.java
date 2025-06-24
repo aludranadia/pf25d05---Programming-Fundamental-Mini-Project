@@ -20,7 +20,10 @@ public class GameMain extends JPanel {
     private Board board;         // the game board
     private State currentState;  // the current state of the game
     private Seed currentPlayer;  // the current player
-    private JLabel statusBar;    // for displaying status message
+    private JLabel statusBar;
+    private JLabel scoreBoard; // for displaying status message
+    private int crossWins = 0;
+    private int noughtWins = 0;
 
     /** Constructor to setup the UI and game components */
     public GameMain() {
@@ -54,6 +57,13 @@ public class GameMain extends JPanel {
                     SoundEffect.DIE.play();
                 }
 
+                if (currentState == State.CROSS_WON) {
+                    crossWins++;
+                } else if (currentState == State.NOUGHT_WON) {
+                    noughtWins++;
+                }
+                updateScoreBoard(); // panggil method untuk update tampilan
+
                 // Refresh the drawing canvas
                 repaint();  // Callback paintComponent().
             }
@@ -67,16 +77,46 @@ public class GameMain extends JPanel {
         statusBar.setPreferredSize(new Dimension(300, 30));
         statusBar.setHorizontalAlignment(JLabel.LEFT);
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 12));
+        scoreBoard = new JLabel();
+        scoreBoard.setFont(FONT_STATUS);
+        scoreBoard.setBackground(COLOR_BG_STATUS);
+        scoreBoard.setOpaque(true);
+        scoreBoard.setPreferredSize(new Dimension(300, 30));
+        scoreBoard.setHorizontalAlignment(JLabel.LEFT);
+        scoreBoard.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 12));
 
+        // Set layout utama dulu
         super.setLayout(new BorderLayout());
+
+// Panel atas untuk skor dan tombol reset
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(COLOR_BG_STATUS);
+
+// Tambahkan scoreBoard ke kiri
+        topPanel.add(scoreBoard, BorderLayout.WEST);
+
+// Tambahkan tombol reset ke kanan
+        JButton resetButton = new JButton("Reset Score");
+        resetButton.setFont(FONT_STATUS);
+        resetButton.addActionListener(e -> {
+            crossWins = 0;
+            noughtWins = 0;
+            updateScoreBoard();
+        });
+        topPanel.add(resetButton, BorderLayout.EAST);
+
+// Tambahkan panel atas ke PAGE_START
+        super.add(topPanel, BorderLayout.PAGE_START);
+
         super.add(statusBar, BorderLayout.PAGE_END); // same as SOUTH
-        super.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT + 30));
+        super.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT + 60));
         // account for statusBar in height
         super.setBorder(BorderFactory.createLineBorder(COLOR_BG_STATUS, 2, false));
 
         // Set up Game
         initGame();
         newGame();
+
     }
 
     /** Initialize the game (run once) */
@@ -95,6 +135,7 @@ public class GameMain extends JPanel {
         board.newGame();
         currentPlayer = Seed.CROSS;    // cross plays first
         currentState = State.PLAYING;  // ready to play
+        updateScoreBoard();
     }
 
     /** Custom painting codes on this JPanel */
@@ -135,4 +176,8 @@ public class GameMain extends JPanel {
             frame.setVisible(true);
         });
     }
+    private void updateScoreBoard() {
+        scoreBoard.setText("X Wins: " + crossWins + "    O Wins: " + noughtWins);
+    }
+
 }
