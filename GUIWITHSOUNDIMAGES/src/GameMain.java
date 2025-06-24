@@ -2,44 +2,35 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-/**
- * Tic-Tac-Toe: Two-player Graphic version with better OO design.
- * The Board and Cell classes are separated in their own classes.
- */
 public class GameMain extends JPanel {
-    private static final long serialVersionUID = 1L; // to prevent serializable warning
+    private static final long serialVersionUID = 1L;
 
-    // Define named constants for the drawing graphics
     public static final String TITLE = "Tic Tac Toe";
     public static final Color COLOR_BG = Color.WHITE;
     public static final Color COLOR_BG_STATUS = new Color(216, 216, 216);
-    public static final Color COLOR_CROSS = new Color(239, 105, 80); // Red #EF6950
-    public static final Color COLOR_NOUGHT = new Color(64, 154, 225); // Blue #409AE1
+    public static final Color COLOR_CROSS = new Color(239, 105, 80);
+    public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
 
-    // Define game objects
-    private Board board;         // the game board
-    private State currentState;  // the current state of the game
-    private Seed currentPlayer;  // the current player
+    private Board board;
+    private State currentState;
+    private Seed currentPlayer;
     private JLabel statusBar;
     private String playerXName = "Player X";
     private String playerOName = "Player O";
-    private JLabel scoreBoard;   // for displaying status message
+    private JLabel scoreBoard;
     private int crossWins = 0;
     private int noughtWins = 0;
 
-    // Tambahkan topPanel dan boardPanel sebagai anggota kelas
     private JPanel topPanel;
     private JPanel boardPanel;
 
-    /** Constructor to setup the UI and game components */
     public GameMain() {
-        // Setup the status bar (JLabel) to display status message
         statusBar = new JLabel();
         statusBar.setFont(FONT_STATUS);
         statusBar.setBackground(COLOR_BG_STATUS);
         statusBar.setOpaque(true);
-        statusBar.setPreferredSize(new Dimension(300, 30)); // Ukuran yang sesuai
+        statusBar.setPreferredSize(new Dimension(300, 30));
         statusBar.setHorizontalAlignment(JLabel.LEFT);
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 12));
 
@@ -47,22 +38,24 @@ public class GameMain extends JPanel {
         scoreBoard.setFont(FONT_STATUS);
         scoreBoard.setBackground(COLOR_BG_STATUS);
         scoreBoard.setOpaque(true);
-        scoreBoard.setPreferredSize(new Dimension(200, 30)); // Sesuaikan lebar agar tidak terlalu dominan
         scoreBoard.setHorizontalAlignment(JLabel.LEFT);
         scoreBoard.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 12));
 
-        // Set layout utama dulu
         super.setLayout(new BorderLayout());
 
-        // Panel atas untuk skor dan tombol reset
-        topPanel = new JPanel(new BorderLayout()); // Inisialisasi di sini
+        topPanel = new JPanel(new GridBagLayout());
         topPanel.setBackground(COLOR_BG_STATUS);
-        topPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, 40)); // Berikan preferred size untuk topPanel
+        topPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, 40));
 
-        // Tambahkan scoreBoard ke kiri
-        topPanel.add(scoreBoard, BorderLayout.WEST);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 5, 0, 5);
 
-        // Tambahkan tombol reset ke kanan
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        topPanel.add(scoreBoard, gbc);
+
         JButton resetButton = new JButton("Reset Score");
         resetButton.setFont(FONT_STATUS);
         resetButton.addActionListener(e -> {
@@ -71,17 +64,15 @@ public class GameMain extends JPanel {
             updateScoreBoard();
             newGame(); // Mulai game baru juga setelah reset skor
         });
-        topPanel.add(resetButton, BorderLayout.EAST);
+        gbc.gridx = 1;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        topPanel.add(resetButton, gbc);
 
-        // Tambahkan panel atas ke PAGE_START
-        super.add(topPanel, BorderLayout.NORTH); // Gunakan BorderLayout.NORTH untuk kejelasan
-
-        // Tambahkan statusBar ke PAGE_END
+        super.add(topPanel, BorderLayout.NORTH);
         super.add(statusBar, BorderLayout.SOUTH);
 
-        // Buat panel terpisah untuk board agar penempatan lebih mudah
-        // Ini akan menempati area CENTER di BorderLayout
-        boardPanel = new JPanel() { // Inisialisasi di sini
+        boardPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -96,23 +87,16 @@ public class GameMain extends JPanel {
         };
         super.add(boardPanel, BorderLayout.CENTER);
 
-
-        // Hapus setPreferredSize pada super, biarkan BorderLayout yang mengatur
         super.setBorder(BorderFactory.createLineBorder(COLOR_BG_STATUS, 2, false));
 
-        // Set up Game
         initGame();
         newGame();
 
-        // This JPanel fires MouseEvent
-        // Letakkan MouseListener setelah semua komponen diinisialisasi dan diatur
-        boardPanel.addMouseListener(new MouseAdapter() { // Mouse listener dipasang di boardPanel
+        boardPanel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) { // mouse-clicked handler
+            public void mouseClicked(MouseEvent e) {
                 int mouseX = e.getX();
                 int mouseY = e.getY();
-                // Karena listener ada di boardPanel, koordinat sudah relatif ke boardPanel
-                // Jadi tidak perlu offset dengan topPanel atau statusBar
                 int row = mouseY / Cell.SIZE;
                 int col = mouseX / Cell.SIZE;
 
@@ -122,11 +106,32 @@ public class GameMain extends JPanel {
                         currentState = board.stepGame(currentPlayer, row, col);
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
                     }
-                } else { // game over
-                    newGame(); // restart the game
+                } else {
+                    // --- START PERUBAHAN UNTUK PROMPT "MAIN LAGI" ---
+                    int option = JOptionPane.showConfirmDialog(
+                            GameMain.this, // Parent component
+                            "Permainan berakhir. Mau main lagi?",
+                            "Tic Tac Toe",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
+                    );
+
+                    if (option == JOptionPane.YES_OPTION) {
+                        newGame(); // Mulai game baru
+                    } else {
+                        System.out.println("Bye!");
+                        // Untuk menutup frame yang berisi GameMain
+                        // Kita perlu mendapatkan referensi ke JFrame induk
+                        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(GameMain.this);
+                        if (topFrame != null) {
+                            topFrame.dispose(); // Tutup frame
+                        }
+                        // Atau System.exit(0); jika ingin menghentikan seluruh aplikasi
+                        // System.exit(0);
+                    }
+                    // --- END PERUBAHAN ---
                 }
 
-                // Play appropriate sound clip
                 if (currentState == State.PLAYING) {
                     SoundEffect.EAT_FOOD.play();
                 } else {
@@ -138,11 +143,10 @@ public class GameMain extends JPanel {
                 } else if (currentState == State.NOUGHT_WON) {
                     noughtWins++;
                 }
-                updateScoreBoard(); // panggil method untuk update tampilan
+                updateScoreBoard();
 
-                // Refresh the drawing canvas
-                boardPanel.repaint(); // Callback paintComponent() dari boardPanel
-                repaint(); // Repaint GameMain untuk update status bar
+                boardPanel.repaint();
+                repaint();
             }
         });
     }
@@ -150,31 +154,26 @@ public class GameMain extends JPanel {
     public void setPlayerNames(String xName, String oName) {
         this.playerXName = xName;
         this.playerOName = oName;
-        updateScoreBoard(); // Update tampilan nama pemain di scoreboard
+        updateScoreBoard();
     }
 
-    /** Initialize the game (run once) */
     public void initGame() {
-        board = new Board(); // allocate the game-board
+        board = new Board();
     }
 
-    /** Reset the game-board contents and the current-state, ready for new game */
     public void newGame() {
-        board.newGame(); // Panggil newGame() milik Board untuk mereset semua sel dan winningLineInfo
-        currentPlayer = Seed.CROSS; // cross plays first
-        currentState = State.PLAYING; // ready to play
-        updateScoreBoard(); // Pastikan scoreboard diupdate
-        boardPanel.repaint(); // Penting untuk me-repaint board setelah newGame
-        repaint(); // Repaint GameMain untuk update status bar
+        board.newGame();
+        currentPlayer = Seed.CROSS;
+        currentState = State.PLAYING;
+        updateScoreBoard();
+        boardPanel.repaint();
+        repaint();
     }
 
-    /** Custom painting codes on this JPanel */
     @Override
-    public void paintComponent(Graphics g) { // Callback via repaint()
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // board.paint(g); // Ini dipindahkan ke boardPanel.paintComponent()
 
-        // Print status-bar message
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
             statusBar.setText((currentPlayer == Seed.CROSS)
@@ -192,17 +191,16 @@ public class GameMain extends JPanel {
         }
     }
 
-    /** The entry "main" method */
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame(TITLE);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setResizable(true); // supaya responsive bekerja
-            frame.setLocationRelativeTo(null); // center
+            frame.setResizable(true);
+            frame.setLocationRelativeTo(null);
 
             frame.setContentPane(new MainMenuPanel(frame));
             frame.setVisible(true);
-            frame.pack(); // Tambahkan ini agar frame menyesuaikan ukuran kontennya
+            frame.pack();
         });
     }
 
