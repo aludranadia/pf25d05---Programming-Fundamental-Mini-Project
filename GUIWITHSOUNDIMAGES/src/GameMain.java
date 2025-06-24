@@ -21,6 +21,8 @@ public class GameMain extends JPanel {
     private State currentState;  // the current state of the game
     private Seed currentPlayer;  // the current player
     private JLabel statusBar;
+    private String playerXName = "Player X";
+    private String playerOName = "Player O";
     private JLabel scoreBoard; // for displaying status message
     private int crossWins = 0;
     private int noughtWins = 0;
@@ -119,6 +121,11 @@ public class GameMain extends JPanel {
 
     }
 
+    public void setPlayerNames(String xName, String oName) {
+        this.playerXName = xName;
+        this.playerOName = oName;
+    }
+
     /** Initialize the game (run once) */
     public void initGame() {
         board = new Board();  // allocate the game-board
@@ -149,16 +156,18 @@ public class GameMain extends JPanel {
         // Print status-bar message
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
-            statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
+            statusBar.setText((currentPlayer == Seed.CROSS)
+                    ? playerXName + "'s Turn (X)"
+                    : playerOName + "'s Turn (O)");
         } else if (currentState == State.DRAW) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("It's a Draw! Click to play again.");
         } else if (currentState == State.CROSS_WON) {
             statusBar.setForeground(Color.RED);
-            statusBar.setText("'X' Won! Click to play again.");
+            statusBar.setText(playerXName + " (X) Won! Click to play again.");
         } else if (currentState == State.NOUGHT_WON) {
             statusBar.setForeground(Color.RED);
-            statusBar.setText("'O' Won! Click to play again.");
+            statusBar.setText(playerOName + " (O) Won! Click to play again.");
         }
     }
 
@@ -177,7 +186,7 @@ public class GameMain extends JPanel {
         });
     }
     private void updateScoreBoard() {
-        scoreBoard.setText("X Wins: " + crossWins + "    O Wins: " + noughtWins);
+        scoreBoard.setText(playerXName + " Wins: " + crossWins + " " + playerOName + " Wins: " + noughtWins);
     }
 
 }

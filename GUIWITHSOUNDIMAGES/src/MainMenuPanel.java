@@ -17,6 +17,20 @@ public class MainMenuPanel extends JPanel {
         title.setOpaque(false);
 
         JButton startButton = new JButton("Mulai Permainan");
+        startButton.addActionListener(e -> {
+            // Tambahkan input nama di sini
+            String playerX = JOptionPane.showInputDialog(this, "Masukkan nama untuk pemain X:");
+            if (playerX == null || playerX.trim().isEmpty()) playerX = "Player X";
+
+            String playerO = JOptionPane.showInputDialog(this, "Masukkan nama untuk pemain O:");
+            if (playerO == null || playerO.trim().isEmpty()) playerO = "Player O";
+
+            GameMain gamePanel = new GameMain();
+            gamePanel.setPlayerNames(playerX, playerO); // ← panggil method setter
+
+            frame.setContentPane(gamePanel);
+            frame.revalidate();
+        });
         JButton exitButton = new JButton("Keluar");
 
         // Styling buttons transparan
