@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.List;
 
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -50,24 +51,37 @@ public class GameMain extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(0, 5, 0, 5);
 
+        // Scoreboard (kiri)
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         topPanel.add(scoreBoard, gbc);
 
+        // Tombol reset (tengah)
         JButton resetButton = new JButton("Reset Score");
         resetButton.setFont(FONT_STATUS);
+        resetButton.setMargin(new Insets(5, 10, 5, 10));
         resetButton.addActionListener(e -> {
             crossWins = 0;
             noughtWins = 0;
             updateScoreBoard();
-            newGame(); // Mulai game baru juga setelah reset skor
+            newGame();
         });
         gbc.gridx = 1;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         topPanel.add(resetButton, gbc);
+
+        // Tombol leaderboard (kanan)
+        JButton leaderboardButton = new JButton("Leaderboard");
+        leaderboardButton.setFont(FONT_STATUS);
+        leaderboardButton.setMargin(new Insets(5, 10, 5, 10));
+        leaderboardButton.addActionListener(e -> {
+            showLeaderboard();
+        });
+        gbc.gridx = 2;
+        topPanel.add(leaderboardButton, gbc);
 
         super.add(topPanel, BorderLayout.NORTH);
         super.add(statusBar, BorderLayout.SOUTH);
@@ -86,7 +100,6 @@ public class GameMain extends JPanel {
             }
         };
         super.add(boardPanel, BorderLayout.CENTER);
-
         super.setBorder(BorderFactory.createLineBorder(COLOR_BG_STATUS, 2, false));
 
         initGame();
@@ -107,9 +120,8 @@ public class GameMain extends JPanel {
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
                     }
                 } else {
-                    // --- START PERUBAHAN UNTUK PROMPT "MAIN LAGI" ---
                     int option = JOptionPane.showConfirmDialog(
-                            GameMain.this, // Parent component
+                            GameMain.this,
                             "Permainan berakhir. Mau main lagi?",
                             "Tic Tac Toe",
                             JOptionPane.YES_NO_OPTION,
@@ -117,19 +129,13 @@ public class GameMain extends JPanel {
                     );
 
                     if (option == JOptionPane.YES_OPTION) {
-                        newGame(); // Mulai game baru
+                        newGame();
                     } else {
-                        System.out.println("Bye!");
-                        // Untuk menutup frame yang berisi GameMain
-                        // Kita perlu mendapatkan referensi ke JFrame induk
                         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(GameMain.this);
                         if (topFrame != null) {
-                            topFrame.dispose(); // Tutup frame
+                            topFrame.dispose();
                         }
-                        // Atau System.exit(0); jika ingin menghentikan seluruh aplikasi
-                        // System.exit(0);
                     }
-                    // --- END PERUBAHAN ---
                 }
 
                 if (currentState == State.PLAYING) {
@@ -140,11 +146,13 @@ public class GameMain extends JPanel {
 
                 if (currentState == State.CROSS_WON) {
                     crossWins++;
+                    LeaderboardManager.updateScore(playerXName);
                 } else if (currentState == State.NOUGHT_WON) {
                     noughtWins++;
+                    LeaderboardManager.updateScore(playerOName);
                 }
-                updateScoreBoard();
 
+                updateScoreBoard();
                 boardPanel.repaint();
                 repaint();
             }
@@ -205,6 +213,23 @@ public class GameMain extends JPanel {
     }
 
     private void updateScoreBoard() {
-        scoreBoard.setText(playerXName + " Wins: " + crossWins + " " + playerOName + " Wins: " + noughtWins);
+        scoreBoard.setText(playerXName + " Wins: " + crossWins + "    " + playerOName + " Wins: " + noughtWins);
+    }
+
+    private void showLeaderboard() {
+        List<PlayerScore> scores = LeaderboardManager.loadLeaderboard();
+        String[] columnNames = {"Nama", "Skor"};
+        Object[][] data = new Object[scores.size()][2];
+
+        for (int i = 0; i < scores.size(); i++) {
+            data[i][0] = scores.get(i).name;
+            data[i][1] = scores.get(i).score;
+        }
+
+        JTable table = new JTable(data, columnNames);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.setFillsViewportHeight(true);
+
+        JOptionPane.showMessageDialog(this, scrollPane, "Leaderboard", JOptionPane.PLAIN_MESSAGE);
     }
 }
