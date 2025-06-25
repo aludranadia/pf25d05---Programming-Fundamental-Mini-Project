@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.List;
+import javax.swing.SwingWorker; // Tetap pakai SwingWorker untuk Leaderboard
 
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -27,6 +28,9 @@ public class GameMain extends JPanel {
     private JPanel boardPanel;
 
     public GameMain() {
+        // Inisialisasi SoundEffect di awal aplikasi
+        SoundEffect.initGame();
+
         statusBar = new JLabel();
         statusBar.setFont(FONT_STATUS);
         statusBar.setBackground(COLOR_BG_STATUS);
@@ -78,7 +82,24 @@ public class GameMain extends JPanel {
         leaderboardButton.setFont(FONT_STATUS);
         leaderboardButton.setMargin(new Insets(5, 10, 5, 10));
         leaderboardButton.addActionListener(e -> {
-            showLeaderboard();
+            // Tampilkan leaderboard di thread latar belakang untuk menghindari UI blocking
+            new SwingWorker<List<PlayerScore>, Void>() {
+                @Override
+                protected List<PlayerScore> doInBackground() throws Exception {
+                    return LeaderboardManager.loadLeaderboard();
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        List<PlayerScore> scores = get(); // Dapatkan hasil dari doInBackground
+                        showLeaderboardDialog(scores); // Tampilkan dialog di EDT
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(GameMain.this, "Gagal memuat leaderboard.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }.execute();
         });
         gbc.gridx = 2;
         topPanel.add(leaderboardButton, gbc);
@@ -118,6 +139,46 @@ public class GameMain extends JPanel {
                             && board.cells[row][col].content == Seed.NO_SEED) {
                         currentState = board.stepGame(currentPlayer, row, col);
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+
+                        SoundEffect.EAT_FOOD.play();
+
+                        if (currentState == State.CROSS_WON) {
+                            crossWins++;
+                            new SwingWorker<Void, Void>() {
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    LeaderboardManager.updateScore(playerXName);
+                                    // GameStatistics tetap dikelola secara terpisah jika diperlukan
+                                    // new GameStatistics(playerXName).recordWin('X');
+                                    return null;
+                                }
+                            }.execute();
+                            SoundEffect.DIE.play();
+                        } else if (currentState == State.NOUGHT_WON) {
+                            noughtWins++;
+                            new SwingWorker<Void, Void>() {
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    LeaderboardManager.updateScore(playerOName);
+                                    // new GameStatistics(playerOName).recordWin('O');
+                                    return null;
+                                }
+                            }.execute();
+                            SoundEffect.DIE.play();
+                        } else if (currentState == State.DRAW) {
+                            // new SwingWorker<Void, Void>() {
+                            //     @Override
+                            //     protected Void doInBackground() throws Exception {
+                            //         // new GameStatistics("Draws").recordDraw();
+                            //         return null;
+                            //     }
+                            // }.execute();
+                            SoundEffect.DIE.play();
+                        }
+
+                        updateScoreBoard();
+                        boardPanel.repaint();
+                        repaint();
                     }
                 } else {
                     int option = JOptionPane.showConfirmDialog(
@@ -137,24 +198,6 @@ public class GameMain extends JPanel {
                         }
                     }
                 }
-
-                if (currentState == State.PLAYING) {
-                    SoundEffect.EAT_FOOD.play();
-                } else {
-                    SoundEffect.DIE.play();
-                }
-
-                if (currentState == State.CROSS_WON) {
-                    crossWins++;
-                    LeaderboardManager.updateScore(playerXName);
-                } else if (currentState == State.NOUGHT_WON) {
-                    noughtWins++;
-                    LeaderboardManager.updateScore(playerOName);
-                }
-
-                updateScoreBoard();
-                boardPanel.repaint();
-                repaint();
             }
         });
     }
@@ -216,8 +259,7 @@ public class GameMain extends JPanel {
         scoreBoard.setText(playerXName + " Wins: " + crossWins + "    " + playerOName + " Wins: " + noughtWins);
     }
 
-    private void showLeaderboard() {
-        List<PlayerScore> scores = LeaderboardManager.loadLeaderboard();
+    private void showLeaderboardDialog(List<PlayerScore> scores) {
         String[] columnNames = {"Nama", "Skor"};
         Object[][] data = new Object[scores.size()][2];
 

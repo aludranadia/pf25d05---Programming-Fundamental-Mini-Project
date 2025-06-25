@@ -11,9 +11,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  * 1. Define all your sound effect names and the associated wave file.
  * 2. To play a specific sound, simply invoke SoundEffect.SOUND_NAME.play().
  * 3. You might optionally invoke the static method SoundEffect.initGame() to pre-load all the
- *    sound files, so that the play is not paused while loading the file for the first time.
+ * sound files, so that the play is not paused while loading the file for the first time.
  * 4. You can the static variable SoundEffect.volume to SoundEffect.Volume.MUTE
- *    to mute the sound.
+ * to mute the sound.
  *
  * For Eclipse, place the audio file under "src", which will be copied into "bin".
  */
@@ -37,6 +37,10 @@ public enum SoundEffect {
         try {
             // Use URL (instead of File) to read from disk and JAR.
             URL url = this.getClass().getClassLoader().getResource(soundFileName);
+            if (url == null) { // Tambahkan cek null untuk URL
+                System.err.println("Couldn't find sound file: " + soundFileName);
+                return; // Keluar jika file tidak ditemukan
+            }
             // Set up an audio input stream piped from the sound file.
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
             // Get a clip resource.
@@ -44,26 +48,31 @@ public enum SoundEffect {
             // Open audio clip and load samples from the audio input stream.
             clip.open(audioInputStream);
         } catch (UnsupportedAudioFileException e) {
+            System.err.println("Unsupported audio file format for: " + soundFileName);
             e.printStackTrace();
         } catch (IOException e) {
+            System.err.println("I/O error loading sound file: " + soundFileName);
             e.printStackTrace();
         } catch (LineUnavailableException e) {
+            System.err.println("Audio line unavailable for: " + soundFileName);
             e.printStackTrace();
         }
     }
 
     /** Play or Re-play the sound effect from the beginning, by rewinding. */
     public void play() {
-        if (volume != Volume.MUTE) {
-            if (clip.isRunning())
-                clip.stop();   // Stop the player if it is still running
-            clip.setFramePosition(0); // rewind to the beginning
-            clip.start();     // Start playing
+        if (clip == null || volume == Volume.MUTE) { // Tambahkan cek null untuk clip
+            return;
         }
+        if (clip.isRunning())
+            clip.stop();   // Stop the player if it is still running
+        clip.setFramePosition(0); // rewind to the beginning
+        clip.start();     // Start playing
     }
 
     /** Optional static method to pre-load all the sound files. */
-    static void initGame() {
+    public static void initGame() { // Ubah akses menjadi public static
         values(); // calls the constructor for all the elements
+        System.out.println("Sound effects pre-loaded.");
     }
 }

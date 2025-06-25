@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.net.URL; // Import URL
 
 public class MainMenuPanel extends JPanel {
     private Image backgroundImage;
@@ -10,19 +11,23 @@ public class MainMenuPanel extends JPanel {
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
 
-        // --- TAMBAHKAN BARIS INI ---
         // Atur ukuran preferred untuk MainMenuPanel agar tidak terlalu kecil
         // Ukuran ini harus setidaknya sama atau lebih besar dari gambar latar belakang
         // atau cukup besar untuk menampung semua komponen.
-        setPreferredSize(new Dimension(400, 450)); // Contoh ukuran, sesuaikan jika perlu
-        // --- AKHIR TAMBAH ---
+        setPreferredSize(new Dimension(500, 500)); // Contoh ukuran, sesuaikan jika perlu
 
         // Load background image from resource folder
-        backgroundImage = new ImageIcon(getClass().getClassLoader().getResource("images/background ttc.jpg")).getImage();
-
+        URL imageUrl = getClass().getClassLoader().getResource("images/background ttc.jpg");
+        if (imageUrl != null) {
+            backgroundImage = new ImageIcon(imageUrl).getImage();
+        } else {
+            System.err.println("Couldn't find background image: images/background ttc.jpg");
+            // Opsional: set background color jika gambar tidak ditemukan
+            setBackground(Color.DARK_GRAY);
+        }
 
         JLabel title = new JLabel("Tic Tac Toe");
-        title.setFont(new Font("Arial", Font.BOLD, 36));
+        title.setFont(new Font("Arial", Font.BOLD, 48)); // Ukuran font lebih besar
         title.setForeground(Color.WHITE);
         title.setOpaque(false);
 
@@ -40,15 +45,16 @@ public class MainMenuPanel extends JPanel {
 
             frame.setContentPane(gamePanel);
             frame.revalidate();
-            // frame.repaint(); // repaint tidak selalu diperlukan setelah setContentPane dan revalidate
             frame.pack(); // Panggil pack() di sini agar frame menyesuaikan ukuran panel game
+            frame.setLocationRelativeTo(null); // Memastikan frame tetap di tengah setelah resize
         });
 
         JButton exitButton = new JButton("Keluar");
 
         // Styling buttons transparan
         for (JButton btn : new JButton[]{startButton, exitButton}) {
-            btn.setPreferredSize(new Dimension(200, 40));
+            btn.setPreferredSize(new Dimension(250, 50)); // Ukuran tombol lebih besar
+            btn.setFont(new Font("Arial", Font.BOLD, 18)); // Font tombol
             btn.setForeground(Color.WHITE);
             btn.setOpaque(false);
             btn.setContentAreaFilled(false);
@@ -59,9 +65,10 @@ public class MainMenuPanel extends JPanel {
         exitButton.addActionListener(e -> System.exit(0));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 0, 15, 0); // Spasi antara komponen
+        gbc.insets = new Insets(20, 0, 20, 0); // Spasi lebih besar antara komponen
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER; // Pusatkan komponen
 
         gbc.gridy = 0;
         add(title, gbc);

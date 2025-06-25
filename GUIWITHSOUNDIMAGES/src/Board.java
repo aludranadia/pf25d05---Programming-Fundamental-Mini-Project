@@ -53,9 +53,9 @@ public class Board {
     }
 
     /**
-     *  The given player makes a move on (selectedRow, selectedCol).
-     *  Update cells[selectedRow][selectedCol]. Compute and return the
-     *  new game state (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).
+     * The given player makes a move on (selectedRow, selectedCol).
+     * Update cells[selectedRow][selectedCol]. Compute and return the
+     * new game state (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).
      */
     public State stepGame(Seed player, int selectedRow, int selectedCol) {
         // Update game board
@@ -94,6 +94,7 @@ public class Board {
     }
 
     /** Paint itself on the graphics canvas, given the Graphics context */
+    // Removed @Override annotation as Board is not a Swing component overriding a paint method.
     public void paint(Graphics g) {
         // Draw the grid-lines
         g.setColor(COLOR_GRID);
