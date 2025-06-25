@@ -1,28 +1,23 @@
 import javax.swing.*;
 import java.awt.*;
-import java.net.URL; // Import URL
+import java.net.URL;
 
 public class MainMenuPanel extends JPanel {
     private Image backgroundImage;
-    private JFrame frame; // Menambahkan referensi ke JFrame
+    private JFrame frame;
 
     public MainMenuPanel(JFrame frame) {
-        this.frame = frame; // Simpan referensi frame
+        this.frame = frame;
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
 
-        // Atur ukuran preferred untuk MainMenuPanel agar tidak terlalu kecil
-        // Ukuran ini harus setidaknya sama atau lebih besar dari gambar latar belakang
-        // atau cukup besar untuk menampung semua komponen.
-        setPreferredSize(new Dimension(500, 500)); // Contoh ukuran, sesuaikan jika perlu
+        setPreferredSize(new Dimension(500, 500)); // Ukuran yang diperbarui
 
-        // Load background image from resource folder
         URL imageUrl = getClass().getClassLoader().getResource("images/background ttc.jpg");
         if (imageUrl != null) {
             backgroundImage = new ImageIcon(imageUrl).getImage();
         } else {
             System.err.println("Couldn't find background image: images/background ttc.jpg");
-            // Opsional: set background color jika gambar tidak ditemukan
             setBackground(Color.DARK_GRAY);
         }
 
@@ -33,7 +28,6 @@ public class MainMenuPanel extends JPanel {
 
         JButton startButton = new JButton("Mulai Permainan");
         startButton.addActionListener(e -> {
-            // Tambahkan input nama di sini
             String playerX = JOptionPane.showInputDialog(this, "Masukkan nama untuk pemain X:");
             if (playerX == null || playerX.trim().isEmpty()) playerX = "Player X";
 
@@ -41,17 +35,16 @@ public class MainMenuPanel extends JPanel {
             if (playerO == null || playerO.trim().isEmpty()) playerO = "Player O";
 
             GameMain gamePanel = new GameMain();
-            gamePanel.setPlayerNames(playerX, playerO); // ← panggil method setter
+            gamePanel.setPlayerNames(playerX, playerO);
 
             frame.setContentPane(gamePanel);
             frame.revalidate();
-            frame.pack(); // Panggil pack() di sini agar frame menyesuaikan ukuran panel game
-            frame.setLocationRelativeTo(null); // Memastikan frame tetap di tengah setelah resize
+            frame.pack();
+            frame.setLocationRelativeTo(null);
         });
 
         JButton exitButton = new JButton("Keluar");
 
-        // Styling buttons transparan
         for (JButton btn : new JButton[]{startButton, exitButton}) {
             btn.setPreferredSize(new Dimension(250, 50)); // Ukuran tombol lebih besar
             btn.setFont(new Font("Arial", Font.BOLD, 18)); // Font tombol
@@ -68,7 +61,7 @@ public class MainMenuPanel extends JPanel {
         gbc.insets = new Insets(20, 0, 20, 0); // Spasi lebih besar antara komponen
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.CENTER; // Pusatkan komponen
+        gbc.anchor = GridBagConstraints.CENTER;
 
         gbc.gridy = 0;
         add(title, gbc);
@@ -82,7 +75,6 @@ public class MainMenuPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (backgroundImage != null) {
-            // Gambar latar belakang mengisi seluruh area panel
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
     }

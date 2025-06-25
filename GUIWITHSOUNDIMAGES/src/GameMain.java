@@ -2,7 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.List;
-import javax.swing.SwingWorker; // Tetap pakai SwingWorker untuk Leaderboard
+import javax.swing.SwingWorker;
 
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,6 @@ public class GameMain extends JPanel {
     private JPanel boardPanel;
 
     public GameMain() {
-        // Inisialisasi SoundEffect di awal aplikasi
         SoundEffect.initGame();
 
         statusBar = new JLabel();
@@ -55,14 +54,12 @@ public class GameMain extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(0, 5, 0, 5);
 
-        // Scoreboard (kiri)
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         topPanel.add(scoreBoard, gbc);
 
-        // Tombol reset (tengah)
         JButton resetButton = new JButton("Reset Score");
         resetButton.setFont(FONT_STATUS);
         resetButton.setMargin(new Insets(5, 10, 5, 10));
@@ -77,12 +74,10 @@ public class GameMain extends JPanel {
         gbc.fill = GridBagConstraints.NONE;
         topPanel.add(resetButton, gbc);
 
-        // Tombol leaderboard (kanan)
         JButton leaderboardButton = new JButton("Leaderboard");
         leaderboardButton.setFont(FONT_STATUS);
         leaderboardButton.setMargin(new Insets(5, 10, 5, 10));
         leaderboardButton.addActionListener(e -> {
-            // Tampilkan leaderboard di thread latar belakang untuk menghindari UI blocking
             new SwingWorker<List<PlayerScore>, Void>() {
                 @Override
                 protected List<PlayerScore> doInBackground() throws Exception {
@@ -92,8 +87,8 @@ public class GameMain extends JPanel {
                 @Override
                 protected void done() {
                     try {
-                        List<PlayerScore> scores = get(); // Dapatkan hasil dari doInBackground
-                        showLeaderboardDialog(scores); // Tampilkan dialog di EDT
+                        List<PlayerScore> scores = get();
+                        showLeaderboardDialog(scores);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         JOptionPane.showMessageDialog(GameMain.this, "Gagal memuat leaderboard.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -148,8 +143,8 @@ public class GameMain extends JPanel {
                                 @Override
                                 protected Void doInBackground() throws Exception {
                                     LeaderboardManager.updateScore(playerXName);
-                                    // GameStatistics tetap dikelola secara terpisah jika diperlukan
-                                    // new GameStatistics(playerXName).recordWin('X');
+                                    // AKTIFKAN GameStatistics untuk pemain X
+                                    new GameStatistics(playerXName).recordWin('X');
                                     return null;
                                 }
                             }.execute();
@@ -160,19 +155,22 @@ public class GameMain extends JPanel {
                                 @Override
                                 protected Void doInBackground() throws Exception {
                                     LeaderboardManager.updateScore(playerOName);
-                                    // new GameStatistics(playerOName).recordWin('O');
+                                    // AKTIFKAN GameStatistics untuk pemain O
+                                    new GameStatistics(playerOName).recordWin('O');
                                     return null;
                                 }
                             }.execute();
                             SoundEffect.DIE.play();
                         } else if (currentState == State.DRAW) {
-                            // new SwingWorker<Void, Void>() {
-                            //     @Override
-                            //     protected Void doInBackground() throws Exception {
-                            //         // new GameStatistics("Draws").recordDraw();
-                            //         return null;
-                            //     }
-                            // }.execute();
+                            new SwingWorker<Void, Void>() {
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    // AKTIFKAN GameStatistics untuk seri (jika Anda memiliki userId khusus untuk seri)
+                                    // Contoh: Gunakan "DRAW_STATS" sebagai userId untuk mencatat seri global
+                                    new GameStatistics("DRAW_STATS").recordDraw();
+                                    return null;
+                                }
+                            }.execute();
                             SoundEffect.DIE.play();
                         }
 

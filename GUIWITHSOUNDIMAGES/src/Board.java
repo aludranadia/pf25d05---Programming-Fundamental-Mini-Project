@@ -94,7 +94,7 @@ public class Board {
     }
 
     /** Paint itself on the graphics canvas, given the Graphics context */
-    // Removed @Override annotation as Board is not a Swing component overriding a paint method.
+    // `@Override` dihapus
     public void paint(Graphics g) {
         // Draw the grid-lines
         g.setColor(COLOR_GRID);

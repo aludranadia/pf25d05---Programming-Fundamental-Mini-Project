@@ -28,7 +28,7 @@ public class Cell {
     }
 
     /** Paint itself on the graphics canvas, given the Graphics context */
-    // Removed @Override annotation as Cell is not a Swing component overriding a paint method.
+    // `@Override` dihapus
     public void paint(Graphics g) {
         // Draw the Seed if it is not empty
         int x1 = col * SIZE + PADDING;
