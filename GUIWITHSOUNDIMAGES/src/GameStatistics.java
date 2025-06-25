@@ -4,16 +4,14 @@ import java.util.Map;
 
 public class GameStatistics {
 
-    // --- Detail Koneksi Database Aiven.io ---
-    // GANTI placeholder ini dengan detail koneksi aktual dari layanan Aiven PostgreSQL Anda!
-    private static final String DB_HOST = "mysql-tictactoed05-pf25d05.f.aivencloud.com";
-    private static final int DB_PORT = 19289;          // Contoh: 24716
-    private static final String DB_NAME = "defaultdb"; // Contoh: defaultdb
-    private static final String DB_USER = "avnadmin";      // Contoh: avnadmin
-    private static final String DB_PASSWORD = "AVNS_Tv_cBPeS9me6-ToZ53E";  // Kata sandi yang diberikan Aiven
+    // --- Detail Koneksi Database Aiven.io (MySQL) ---
+    // GANTI placeholder ini dengan detail koneksi aktual dari layanan Aiven MySQL Anda!
+    // Pastikan ini cocok dengan yang ada di LeaderboardManager.java
+    private static final String DB_URL = "jdbc:mysql://mysql-tictactoed05-pf25d05.f.aivencloud.com:19289/tictactoe";
+    private static final String DB_USER = "avnadmin";
+    private static final String DB_PASSWORD = "AVNS_Tv_cBPeS9me6-ToZ53E";
 
-    private static final String DB_URL = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME;
-    private static final String TABLE_NAME = "game_stats";
+    private static final String TABLE_NAME = "game_stats"; // Nama tabel untuk statistik game
 
     private String userId; // Identifikasi unik untuk setiap pemain (misal: username)
     private int crossWins;
@@ -31,17 +29,19 @@ public class GameStatistics {
 
     private void initializeDatabase() {
         try {
-            // Memuat driver JDBC PostgreSQL
-            Class.forName("org.postgresql.Driver");
-            System.out.println("PostgreSQL JDBC Driver loaded!");
+            // Memuat driver JDBC MySQL
+            // Untuk MySQL Connector/J 8.x ke atas, pendaftaran driver tidak lagi diperlukan secara eksplisit
+            // Class.forName("com.mysql.cj.jdbc.Driver"); // Baris ini tidak wajib tapi bisa membantu debug
+            System.out.println("MySQL JDBC Driver should be available!");
             createTableIfNotExists();
-        } catch (ClassNotFoundException e) {
-            System.err.println("PostgreSQL JDBC Driver not found. Make sure it's in your classpath.");
+        } catch (SQLException e) {
+            System.err.println("Error initializing database: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void createTableIfNotExists() {
+    private void createTableIfNotExists() throws SQLException {
+        // SQL untuk membuat tabel jika belum ada, disesuaikan untuk MySQL
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + "user_id VARCHAR(255) PRIMARY KEY,"
                 + "cross_wins INT DEFAULT 0,"
@@ -52,10 +52,7 @@ public class GameStatistics {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
              Statement statement = connection.createStatement()) {
             statement.execute(createTableSQL);
-            System.out.println("Table '" + TABLE_NAME + "' ensured to exist.");
-        } catch (SQLException e) {
-            System.err.println("Error creating table: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Table '" + TABLE_NAME + "' ensured to exist (MySQL).");
         }
     }
 
@@ -84,13 +81,13 @@ public class GameStatistics {
     }
 
     public void saveStatisticsToDatabase() {
-        // Menggunakan UPSERT (ON CONFLICT) untuk INSERT atau UPDATE baris
+        // Menggunakan ON DUPLICATE KEY UPDATE untuk INSERT atau UPDATE baris pada MySQL
         String upsertSQL = "INSERT INTO " + TABLE_NAME + " (user_id, cross_wins, nought_wins, draws) "
                 + "VALUES (?, ?, ?, ?) "
-                + "ON CONFLICT (user_id) DO UPDATE SET "
-                + "cross_wins = EXCLUDED.cross_wins, "
-                + "nought_wins = EXCLUDED.nought_wins, "
-                + "draws = EXCLUDED.draws;";
+                + "ON DUPLICATE KEY UPDATE "
+                + "cross_wins = VALUES(cross_wins), "
+                + "nought_wins = VALUES(nought_wins), "
+                + "draws = VALUES(draws);";
 
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(upsertSQL)) {
