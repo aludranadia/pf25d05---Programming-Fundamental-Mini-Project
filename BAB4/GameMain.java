@@ -1,4 +1,4 @@
-package GUIOODESIGN;
+package BAB4;
 
 import java.awt.*;
 import java.awt.event.*;

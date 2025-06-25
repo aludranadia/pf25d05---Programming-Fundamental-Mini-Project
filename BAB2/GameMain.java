@@ -1,4 +1,4 @@
-package CONSOLEOO;
+package BAB2;
 
 import java.util.Scanner;
 /**

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GUIWITHSOUNDIMAGES/GUIWITHSOUNDIMAGES.iml" filepath="$PROJECT_DIR$/GUIWITHSOUNDIMAGES/GUIWITHSOUNDIMAGES.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TICTACTOE/TICTACTOE.iml" filepath="$PROJECT_DIR$/TICTACTOE/TICTACTOE.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/pf25d05---Programming-Fundamental-Mini-Project.iml" filepath="$PROJECT_DIR$/.idea/pf25d05---Programming-Fundamental-Mini-Project.iml" />
     </modules>
   </component>

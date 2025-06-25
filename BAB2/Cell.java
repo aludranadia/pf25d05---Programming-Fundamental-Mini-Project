@@ -1,4 +1,4 @@
-package CONSOLEOO;
+package BAB2;
 
 public class Cell {
     // Define properties (package-visible)

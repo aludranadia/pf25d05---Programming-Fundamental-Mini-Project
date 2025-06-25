@@ -1,4 +1,4 @@
-package CONSOLEOO;
+package BAB2;
 
 public class Board {
     // Define named constants for the grid

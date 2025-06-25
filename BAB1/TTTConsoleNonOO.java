@@ -1,4 +1,4 @@
-package CONSOLENONOO;
+package BAB1;
 
 import java.util.Scanner;
 /**

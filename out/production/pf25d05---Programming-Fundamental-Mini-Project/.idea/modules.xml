@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/RECENT/RECENT.iml" filepath="$PROJECT_DIR$/RECENT/RECENT.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/pf25d05---Programming-Fundamental-Mini-Project.iml" filepath="$PROJECT_DIR$/.idea/pf25d05---Programming-Fundamental-Mini-Project.iml" />
     </modules>
   </component>

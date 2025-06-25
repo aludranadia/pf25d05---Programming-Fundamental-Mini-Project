@@ -1,4 +1,4 @@
-package GUIOODESIGNWITHLINE;
+package BAB4WITHDRAWLINE;
 
 import java.awt.*;
 /**

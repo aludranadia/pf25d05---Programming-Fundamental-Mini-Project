@@ -1,15 +1,15 @@
-package CONSOLEOO;
+package BAB4WITHDRAWLINE;
 
 public enum Seed {
     CROSS("X"), NOUGHT("O"), NO_SEED(" ");
 
-    // Private variable
+    // Variabel privat
     private String icon;
-    // Constructor (must be private)
+    // Konstruktor (harus privat)
     private Seed(String icon) {
         this.icon = icon;
     }
-    // Public Getter
+    // Getter Publik
     public String getIcon() {
         return icon;
     }

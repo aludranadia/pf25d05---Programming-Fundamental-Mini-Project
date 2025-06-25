@@ -1,4 +1,4 @@
-package GUIOODESIGN;
+package BAB2;
 
 public enum Seed {
     CROSS("X"), NOUGHT("O"), NO_SEED(" ");

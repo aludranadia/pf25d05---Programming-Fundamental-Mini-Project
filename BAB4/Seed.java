@@ -1,15 +1,15 @@
-package GUIOODESIGNWITHLINE;
+package BAB4;
 
 public enum Seed {
     CROSS("X"), NOUGHT("O"), NO_SEED(" ");
 
-    // Variabel privat
+    // Private variable
     private String icon;
-    // Konstruktor (harus privat)
+    // Constructor (must be private)
     private Seed(String icon) {
         this.icon = icon;
     }
-    // Getter Publik
+    // Public Getter
     public String getIcon() {
         return icon;
     }
